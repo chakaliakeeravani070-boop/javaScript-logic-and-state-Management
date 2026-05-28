@@ -1,0 +1,70 @@
+// src/App.jsx
+import { useState } from 'react';
+
+// 1. Mock Data (This stays outside the component so it doesn't re-render)
+const ITEMS = [
+  { id: 1, name: 'Premium Laptop', category: 'Electronics', price: 1200 },
+  { id: 2, name: 'Wireless Headphones', category: 'Electronics', price: 150 },
+  { id: 3, name: 'Running Shoes', category: 'Fitness', price: 90 },
+  { id: 4, name: 'Yoga Mat', category: 'Fitness', price: 30 },
+  { id: 5, name: 'Coffee Maker', category: 'Kitchen', price: 80 },
+];
+
+export default function App() {
+  // 2. Local State variables
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // 3. JavaScript Logic: Derived State
+  // Don't create an extra state variable for filtered items! Calculate it on the fly.
+  const filteredItems = ITEMS.filter(item => {
+    const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  return (
+    <div className="p-8 max-w-2xl mx-auto font-sans">
+      <h1 className="text-2xl font-bold mb-6">Product Catalog & State Logic</h1>
+
+      {/* Inputs that alter the State */}
+      <div className="flex gap-4 mb-6">
+        <input 
+          type="text" 
+          placeholder="Search items..." 
+          className="border p-2 rounded w-full"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)} // Mutates state
+        />
+
+        <select 
+          className="border p-2 rounded"
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)} // Mutates state
+        />
+          <option value="All">All Categories</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Fitness">Fitness</option>
+          <option value="Kitchen">Kitchen</option>
+        </select>
+      </div>
+
+      {/* Displaying Data based on Current State */}
+      <div className="space-y-2">
+        {filteredItems.length > 0 ? (
+          filteredItems.map(item => (
+            <div key={item.id} className="border p-4 rounded flex justify-between bg-white shadow-sm">
+              <div>
+                <p className="font-semibold">{item.name}</p>
+                <span className="text-xs bg-gray-200 px-2 py-0.5 rounded text-gray-600">{item.category}</span>
+              </div>
+              <p className="font-bold text-green-600">${item.price}</p>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500 text-center py-4">No items match your criteria.</p>
+        )}
+      </div>
+    </div>
+  );
+}
